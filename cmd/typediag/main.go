@@ -71,6 +71,9 @@ func (f Function) String() string {
 type Info struct {
 	Functions []Function
 	Types     map[string]bool
+
+	IsConstructor func(string) bool
+	IsExported    func(string) bool
 }
 
 var (
@@ -85,7 +88,7 @@ digraph G {
     {{range $pt, $_ := .ParamTypes }}
 	  "{{$pt}}"->f{{$i}};
 	{{end}}
-	{{if ne .Recv ""}}
+	{{if and (ne .Recv "") (call $.IsExported .Recv)}}
 	  "{{.Recv}}"->f{{$i}}; 
 	{{end}}
     {{range $rt, $_ := .ReturnTypes }}
@@ -101,7 +104,13 @@ func (i Info) Render(w io.Writer) error {
 }
 
 func NewInfo() *Info {
-	return &Info{Types: map[string]bool{}}
+	return &Info{
+		Types: map[string]bool{},
+		IsConstructor: func(s string) bool {
+			return strings.HasPrefix(s, "New") || strings.HasPrefix(s, "new")
+		},
+		IsExported: ast.IsExported,
+	}
 }
 
 func (d *diag) RecvType(r *ast.FieldList) string {
