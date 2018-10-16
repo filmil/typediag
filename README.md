@@ -24,16 +24,13 @@ Installation instructions below assume go 1.11.
 # Installation
 
 ```console
-git checkout https://github.com/filmil/typediag.git
-cd typediag
-make install
-cp ./scripts/typediag.sh $SOMEWHERE_IN_YOUR_PATH
+git install github.com/filmil/typediag/...
 ```
 
 # Use
 
 ```console
-typediag.sh /some/directory/containing/go/code $HOME/out.png
+typediag --path=/some/directory/containing/go/code --output=$HOME/out.png
 ```
 
 [1]: http://www.graphviz.org
