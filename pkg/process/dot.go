@@ -4,6 +4,8 @@ package process
 import (
 	"io"
 	"os/exec"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -20,6 +22,7 @@ func Required(program string) string {
 	return path
 }
 
+// Cmd is a dot command and execution error.
 type Cmd struct {
 	command *exec.Cmd
 	err     error
@@ -32,6 +35,7 @@ func NewCommand(output string) *Cmd {
 	return &c
 }
 
+// StdinPipe gets the input end of the stdin pipe for the executed program.
 func (c *Cmd) StdinPipe() io.WriteCloser {
 	if c.err != nil {
 		return nil
@@ -41,6 +45,7 @@ func (c *Cmd) StdinPipe() io.WriteCloser {
 	return w
 }
 
+// Start runs the dot program asynchronously.
 func (c *Cmd) Start() {
 	if c.err != nil {
 		return
@@ -48,13 +53,17 @@ func (c *Cmd) Start() {
 	c.err = c.command.Start()
 }
 
+// Wait waits for dot to complete the graph rendering.
 func (c *Cmd) Wait() {
 	if c.err != nil {
 		return
 	}
+	log.Debugf("Wait()")
 	c.err = c.command.Wait()
+	log.Debugf("Wait() end")
 }
 
+// Error returns the error (if any)
 func (c *Cmd) Error() error {
 	return c.err
 }

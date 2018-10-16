@@ -185,7 +185,9 @@ func (d *Diagram) render(decls *Info, w io.Writer) {
 	if d.err != nil {
 		return
 	}
+	fmt.Printf("render\n")
 	d.err = decls.Render(w)
+	fmt.Printf("render end\n")
 }
 
 func (d *Diagram) Render() error {
@@ -198,6 +200,7 @@ func (d *Diagram) Render() error {
 	}
 	c.Start()
 	d.render(decls, pipe)
+	pipe.Close()
 	c.Wait()
 	return c.Error()
 }
