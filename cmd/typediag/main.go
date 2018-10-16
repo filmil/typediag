@@ -11,21 +11,22 @@ import (
 
 var (
 	// path is the go package path to analyze.
-	path string
-
+	path     string
 	exported bool
+	output   string
 )
 
 func main() {
 	flag.StringVar(&path, "path", "", "Package path to analyze")
 	flag.BoolVar(&exported, "exported-only", true, "If set, only exported types are analyzed")
+	flag.StringVar(&output, "output", "out.png", "Output file")
 	flag.Parse()
 
 	if path == "" {
 		log.Fatalf("flag --path=... is required")
 	}
 
-	d := dot.NewDiagram(exported, path)
+	d := dot.NewDiagram(exported, path, output)
 
 	if err := d.Render(); err != nil {
 		log.Fatalf("unexpected error: %v", err)

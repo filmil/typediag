@@ -8,21 +8,23 @@ import (
 	"go/printer"
 	"go/token"
 	"io"
-	"os"
 	"strings"
 	"text/template"
+
+	"github.com/filmil/typediag/pkg/process"
 )
 
 // Diagram is a dot diagram genrerator based on passed in golang package path.
 type Diagram struct {
 	path     string
 	exported bool
+	output   string
 	err      error
 	fset     token.FileSet
 }
 
-func NewDiagram(exported bool, path string) *Diagram {
-	return &Diagram{path: path, exported: exported}
+func NewDiagram(exported bool, path, output string) *Diagram {
+	return &Diagram{path: path, exported: exported, output: output}
 }
 
 // ParseDir parses the go package in the given path.
@@ -189,10 +191,13 @@ func (d *Diagram) render(decls *Info, w io.Writer) {
 func (d *Diagram) Render() error {
 	p := d.ParseDir(d.path)
 	decls := d.FuncDecls(p)
-	c := process.NewCommand(output)
+	c := process.NewCommand(d.output)
 	pipe := c.StdinPipe()
-	c.Run()
+	if d.err != nil {
+		return d.err
+	}
+	c.Start()
 	d.render(decls, pipe)
-	d.err = c.Wait()
-	return d.err
+	c.Wait()
+	return c.Error()
 }

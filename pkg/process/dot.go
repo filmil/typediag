@@ -1,7 +1,10 @@
 // Package process has code that runs graphviz dot command as a subprocess.
 package process
 
-import "os/exec"
+import (
+	"io"
+	"os/exec"
+)
 
 var (
 	// dot is the "dot" executable.
