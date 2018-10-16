@@ -189,6 +189,10 @@ func (d *Diagram) render(decls *Info, w io.Writer) {
 func (d *Diagram) Render() error {
 	p := d.ParseDir(d.path)
 	decls := d.FuncDecls(p)
-	d.render(decls, os.Stdout)
+	c := process.NewCommand(output)
+	pipe := c.StdinPipe()
+	c.Run()
+	d.render(decls, pipe)
+	d.err = c.Wait()
 	return d.err
 }
